@@ -1,0 +1,74 @@
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  height: 20px;
+  text-align: center;
+  font-size: 15px;
+  color: gray;
+}
+
+.footer:before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 50px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.2),
+    0 8px 0 -3px #f6f6f6,
+    0 9px 1px -3px rgba(0, 0, 0, 0.2),
+    0 16px 0 -6px #f6f6f6,
+    0 17px 2px -6px rgba(0, 0, 0, 0.2);
+}
+.todo-count {
+  text-align: left;
+}
+
+.todo-count strong {
+  font-weight: 300;
+}
+
+.clear-completed,
+html .clear-completed:active {
+  position: relative;
+  line-height: 20px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  background-color: rgba(28,28,28,0);
+  color: gray;
+  margin-right: 20px;
+}
+
+.clear-completed:hover {
+  text-decoration: underline;
+}
+
+.clear-completed:focus {
+  outline: none;
+}
+
+.filters {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  right: 0;
+  left: 0;
+}
+
+.filters li {
+  display: inline;
+  cursor: default;
+}
+
+
+@media (max-width: 430px) {
+  .footer {
+    height: 50px;
+  }
+}
