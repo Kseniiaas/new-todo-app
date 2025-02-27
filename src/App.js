@@ -13,12 +13,14 @@ class App extends Component {
     };
   }
 
-  addTask = (description) => {
+  addTask = (description, minutes, seconds) => {
     const newTask = {
       id: Date.now(),
       description,
       completed: false,
       createdAt: new Date(),
+      minutes,
+      seconds,
     };
 
     this.setState(({ tasks }) => ({

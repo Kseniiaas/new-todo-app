@@ -10,40 +10,44 @@ class Task extends Component {
     this.state = {
       isEditing: false,
       newDescription: task.description,
+      remainingTime: task.minutes * 60 + task.seconds,
+      isRunning: false,
     };
+    this.timer = null;
   }
 
-  startEditing = () => {
-    this.setState({ isEditing: true });
-  };
-
-  handleChange = (event) => {
-    this.setState({ newDescription: event.target.value });
-  };
-
-  handleKeyDown = (event) => {
-    if (event.key === 'Enter') {
-      this.saveTask();
+  startTimer = () => {
+    const { isRunning } = this.state;
+    if (!isRunning) {
+      this.timer = setInterval(() => {
+        this.setState((prevState) => {
+          const { remainingTime } = prevState;
+          if (remainingTime > 0) {
+            return { remainingTime: remainingTime - 1 };
+          }
+          clearInterval(this.timer);
+          return { isRunning: false };
+        });
+      }, 1000);
+      this.setState({ isRunning: true });
     }
   };
 
-  handleBlur = () => {
-    this.saveTask();
+  pauseTimer = () => {
+    clearInterval(this.timer);
+    this.setState({ isRunning: false });
   };
 
-  saveTask = () => {
-    const { newDescription } = this.state;
-    const { task, editTask } = this.props;
-
-    if (newDescription.trim() !== '') {
-      editTask(task.id, newDescription);
-    }
-    this.setState({ isEditing: false });
+  formatTime = () => {
+    const { remainingTime } = this.state;
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   render() {
-    const { task, toggleComplete, deleteTask } = this.props;
-    const { isEditing, newDescription } = this.state;
+    const { task, toggleComplete, deleteTask, editTask } = this.props;
+    const { isEditing, newDescription, isRunning } = this.state;
 
     return (
       <li className={task.completed ? 'completed' : ''}>
@@ -64,16 +68,38 @@ class Task extends Component {
               name="taskDescription"
               className="edit-input"
               value={newDescription}
-              onChange={this.handleChange}
-              onKeyDown={this.handleKeyDown}
-              onBlur={this.handleBlur}
+              onChange={(e) =>
+                this.setState({ newDescription: e.target.value })
+              }
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  editTask(task.id, newDescription);
+                  this.setState({ isEditing: false });
+                }
+              }}
+              onBlur={() => this.setState({ isEditing: false })}
             />
           ) : (
             <label
-              htmlFor={`toggle-task-${task.id}`}
-              onDoubleClick={this.startEditing}
+              htmlFor={`task-${task.id}`}
+              onDoubleClick={() => this.setState({ isEditing: true })}
             >
-              <span className="description">{task.description}</span>
+              <span className="title">{task.description}</span>
+              <span className="description">
+                <button
+                  type="button"
+                  className="icon icon-play"
+                  onClick={this.startTimer}
+                  disabled={isRunning}
+                />
+                <button
+                  type="button"
+                  className="icon icon-pause"
+                  onClick={this.pauseTimer}
+                  disabled={!isRunning}
+                />
+                {this.formatTime()}
+              </span>
               <span className="created">
                 {`created ${formatDistanceToNow(new Date(task.createdAt), { addSuffix: true, includeSeconds: true })}`}
               </span>
@@ -83,7 +109,7 @@ class Task extends Component {
           <button
             type="button"
             className="icon icon-edit"
-            onClick={this.startEditing}
+            onClick={() => this.setState({ isEditing: true })}
             aria-label="Edit task"
           />
           <button
@@ -107,6 +133,8 @@ Task.propTypes = {
       PropTypes.instanceOf(Date),
       PropTypes.string,
     ]).isRequired,
+    minutes: PropTypes.number.isRequired,
+    seconds: PropTypes.number.isRequired,
   }).isRequired,
   toggleComplete: PropTypes.func.isRequired,
   deleteTask: PropTypes.func.isRequired,
