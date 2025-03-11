@@ -9,17 +9,19 @@ function NewTaskForm({ addTask }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (description.trim()) {
-      addTask(
-        description,
-        parseInt(minutes, 10) || 0,
-        parseInt(seconds, 10) || 0,
-      );
-      setDescription('');
-      setMinutes('');
-      setSeconds('');
-    }
+    addTask(
+      description,
+      parseInt(minutes, 10) || 0,
+      parseInt(seconds, 10) || 0,
+    );
+    setDescription('');
+    setMinutes('');
+    setSeconds('');
   };
+
+  const isValid =
+    description.trim() &&
+    (parseInt(minutes, 10) > 0 || parseInt(seconds, 10) > 0);
 
   return (
     <header className="header">
@@ -40,6 +42,7 @@ function NewTaskForm({ addTask }) {
           onChange={(e) => setMinutes(e.target.value)}
           name="minutes"
           type="number"
+          min="0"
         />
         <input
           className="new-todo-form__timer"
@@ -48,8 +51,9 @@ function NewTaskForm({ addTask }) {
           onChange={(e) => setSeconds(e.target.value)}
           name="seconds"
           type="number"
+          min="0"
         />
-        <button type="submit" className="submit">
+        <button type="submit" className="submit" disabled={!isValid}>
           Submit
         </button>
       </form>

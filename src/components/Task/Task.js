@@ -19,6 +19,9 @@ function Task({ task, toggleComplete, deleteTask, editTask }) {
       }, 1000);
     } else if (remainingTime === 0) {
       setIsRunning(false);
+      if (!task.completed) {
+        toggleComplete(task.id);
+      }
     }
     return () => clearInterval(timer);
   }, [isRunning, remainingTime]);
@@ -63,13 +66,13 @@ function Task({ task, toggleComplete, deleteTask, editTask }) {
                 type="button"
                 className="icon icon-play"
                 onClick={() => setIsRunning(true)}
-                disabled={isRunning}
+                disabled={isRunning || task.completed}
               />
               <button
                 type="button"
                 className="icon icon-pause"
                 onClick={() => setIsRunning(false)}
-                disabled={!isRunning}
+                disabled={!isRunning || task.completed}
               />
               {formatTime()}
             </span>
@@ -88,6 +91,7 @@ function Task({ task, toggleComplete, deleteTask, editTask }) {
           className="icon icon-edit"
           onClick={() => setIsEditing(true)}
           aria-label="Edit task"
+          disabled={task.completed}
         />
         <button
           type="button"
